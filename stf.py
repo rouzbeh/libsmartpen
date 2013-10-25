@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python3
 
 import cairo
 import sys
@@ -28,7 +28,7 @@ class Parser(parsestf.STFParser):
                 ctx.move_to(x, y)
         self.last_force = 1
 
-f = file(sys.argv[1])
+f = open(sys.argv[1], 'rb')
 p = Parser(f)
 p.parse()
 

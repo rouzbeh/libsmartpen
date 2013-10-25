@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python3
 
 class BitReader(object):
     def __init__(self, stream):
@@ -18,15 +18,15 @@ class BitReader(object):
             self.byte = ord(self.stream.read(1))
             sank_bytes += 1
         if debug and sank_bytes > 1:
-            print "resync: ate %d bytes" % (sank_bytes - 1)
+            print("resync: ate %d bytes" % (sank_bytes - 1))
         self.nbits = 8
 
     def get_bits(self, n=1):
         while n > self.nbits:
             x = self.stream.read(1)
             if x == "":
-                print self.nbits
-                print "%x" % self.byte
+                print(self.nbits)
+                print("%x" % self.byte)
                 raise EOFError
 
             x = ord(x)
@@ -66,7 +66,7 @@ class STFParser(object):
             raise RuntimeError("bad magic %x" % magic)
 
         version = stream.read(14)
-        if version != "Anoto STF v1.0":
+        if version != b"Anoto STF v1.0":
             raise RuntimeError("bad version %s" % version)
 
         speed = br.get_bits(16)
@@ -182,7 +182,7 @@ class STFParser(object):
             elif header == 0x80:
                 break
             else:
-                print "bad header %x" % header
+                print("bad header %x" % header)
                 continue
 
             try:
@@ -200,7 +200,7 @@ class STFParser(object):
                     if header==0 or header==1:
                         time = self.get_time()
                     else:
-                        header2 = self.get_header2(br)
+                        header2 = self.get_header2()
                         if header2 == 0:
                             time = br.get_bits(8)
                         elif header2 == 1:
@@ -208,7 +208,7 @@ class STFParser(object):
                         elif header2 == 2:
                             time = br.get_bits(32)
                         else:
-                            print "bad stroke time header %d" % header2
+                            print("bad stroke time header %d" % header2)
 
                     if time==0:
                         self.handle_stroke_end(time)
@@ -237,20 +237,21 @@ class STFParser(object):
                     deltaf = self.get_deltaforce()
 
                     if do_delta:
-                        xa = deltax + (xa * time) / 256
-                        ya = deltay + (ya * time) / 256
+                        xa = deltax + (xa * time) // 256
+                        ya = deltay + (ya * time) // 256
 
                     x0 += xa
-                    xa *= 256 / time
+                    xa *= 256 // time
 
                     y0 += ya
-                    ya *= 256 / time
+                    ya *= 256 // time
                     f0 += deltaf 
 
                     self.handle_point(x0, y0, f0, start_time)
                     pass
-            except Exception, e:
-                print e
+            except Exception as e:
+                print(e)
+                raise
                 continue
         pass
 
@@ -258,7 +259,7 @@ class STFParser(object):
         pass
 
     def handle_point(self, x, y, force, time):
-        print "Override STFParser and provide your own!"
+        print("Override STFParser and provide your own!")
         assert False
 
 if __name__ == "__main__":
@@ -266,10 +267,10 @@ if __name__ == "__main__":
 
     class TestParser(STFParser):
         def handle_point(self, x, y, f, time):
-            print "%d, %d, %d, %d" % (x, y, f, time)
+            print("%d, %d, %d, %d" % (x, y, f, time))
 
-    f = file(sys.argv[1])
+    f = open(sys.argv[1], 'rb')
     tp = TestParser(f)
-    print "Speed is %d" % tp.speed
+    print("Speed is %d" % tp.speed)
     tp.parse()
 

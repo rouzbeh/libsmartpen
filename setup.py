@@ -1,9 +1,13 @@
-#!/usr/bin/python
+#!/usr/bin/env python3
 
 from distutils.core import setup
 from distutils.extension import Extension
-from Pyrex.Distutils import build_ext
+from Cython.Build import cythonize
 if __name__ == "__main__":
+    extensions = [ 
+        Extension("pysmartpen", ["pysmartpen.pyx"], libraries = ["smartpen"],
+                  library_dirs=["."])
+        ]
     setup(
       version = "0.6",
       author = "Steven Walter",
@@ -12,9 +16,6 @@ if __name__ == "__main__":
       license = "GPLv2",
       name = "pysmartpen",
       py_modules=["parsestf"],
-      ext_modules=[ 
-        Extension("pysmartpen", ["pysmartpen.pyx"], libraries = ["smartpen"],
-                  library_dirs=["."])
-        ],
+      ext_modules=cythonize(extensions),
       cmdclass = {'build_ext': build_ext}
     )

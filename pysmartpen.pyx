@@ -47,10 +47,12 @@ cdef class Smartpen:
         if (self.obex == NULL):
             raise RuntimeError("Not connected")
 
-        f = fopen(filename, "w")
+        filename_bytes = bytes(filename, "utf-8")
+        f = fopen(filename_bytes, "w")
         if (f == NULL):
             raise IOError("Failed to open %s" % filename)
-        rc = smartpen_get_guid(self.obex, f, guid, start_time)
+        guid_bytes = bytes(guid, "utf-8")
+        rc = smartpen_get_guid(self.obex, f, guid_bytes, start_time)
         fclose(f)
         return rc
 
@@ -64,7 +66,8 @@ cdef class Smartpen:
         if (self.obex == NULL):
             raise RuntimeError("Not connected")
 
-        f = fopen(filename, "w")
+        filename_bytes = bytes(filename, "utf-8")
+        f = fopen(filename_bytes, "w")
         if (f == NULL):
             raise IOError("Failed to open %s" % filename)
         with nogil:

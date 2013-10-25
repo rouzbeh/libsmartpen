@@ -1,9 +1,9 @@
 # vim: set noet sw=8 :
-LOCAL_CFLAGS=-Wall -fPIC `pkg-config --cflags python glib-2.0 openobex libusb-1.0` -g
+LOCAL_CFLAGS=-Wall -fPIC `pkg-config --cflags python3 glib-2.0 openobex libusb-1.0` -g
 
 export PKG_CONFIG_PATH=$(HOME)/sandboxes/openobex/lib/pkgconfig
 
-all: libsmartpen.so
+all: libsmartpen.so pysmartpen.so
 
 %.o: %.c
 	gcc -o $@ -c $^ $(CFLAGS) $(LOCAL_CFLAGS)
@@ -15,7 +15,7 @@ pysmartpen.so: smartpen.o pysmartpen.o
 	gcc -o $@ -shared $^ `pkg-config --libs glib-2.0 openobex libusb-1.0`
 
 pysmartpen.c: pysmartpen.pyx
-	pyrexc $^
+	cython -3 -a $^
 
 obex: test.o smartpen.o
 	gcc -o $@ $^ `pkg-config --libs glib-2.0 openobex libusb-1.0` -L. -lsmartpen
@@ -23,7 +23,7 @@ obex: test.o smartpen.o
 .PHONY: install clean
 
 clean:
-	rm -f libsmartpen.so *.o pysmartpen.c
+	rm -f libsmartpen.so pysmartpen.so *.o pysmartpen.c
 
 install: libsmartpen.so
 	if [ "x${LIBDIR}" = "x" ]; then \
