@@ -1,0 +1,9 @@
+Installing the pen communication library pysmartpen on Ubuntu:
+
+    sudo apt-get install python3-dev libopenobex1-dev libusb-1.0.0-dev
+    make pysmartpen.so
+
+Dependency of stf.py (to convert stf file into png):
+
+    sudo apt-get install python3-cairo-dev
+
